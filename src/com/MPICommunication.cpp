@@ -69,7 +69,7 @@ PtrRequest MPICommunication::aSend(const int *itemsToSend, int size, int rankRec
   PRECICE_TRACE(size);
   rankReceiver = adjustRank(rankReceiver);
 
-  MPI_Request request;
+  MPI_Request request = nullptr;
   MPI_Isend(const_cast<int *>(itemsToSend),
             size,
             MPI_INT,
@@ -98,7 +98,7 @@ PtrRequest MPICommunication::aSend(const double *itemsToSend, int size, int rank
   PRECICE_TRACE(size, rankReceiver);
   rankReceiver = adjustRank(rankReceiver);
 
-  MPI_Request request;
+  MPI_Request request = nullptr;
   MPI_Isend(const_cast<double *>(itemsToSend),
             size,
             MPI_DOUBLE,
@@ -115,7 +115,7 @@ PtrRequest MPICommunication::aSend(std::vector<double> const &itemsToSend, int r
   PRECICE_TRACE(rankReceiver, itemsToSend.size(), itemsToSend);
   rankReceiver = adjustRank(rankReceiver);
 
-  MPI_Request request;
+  MPI_Request request = nullptr;
   MPI_Isend(const_cast<double *>(itemsToSend.data()),
             itemsToSend.size(),
             MPI_DOUBLE,
@@ -178,7 +178,7 @@ PtrRequest MPICommunication::aSend(const bool &itemToSend, int rankReceiver)
   PRECICE_TRACE();
   rankReceiver = adjustRank(rankReceiver);
 
-  MPI_Request request;
+  MPI_Request request = nullptr;
   MPI_Isend(const_cast<bool *>(&itemToSend),
             1,
             MPI_BOOL,
@@ -193,8 +193,8 @@ PtrRequest MPICommunication::aSend(const bool &itemToSend, int rankReceiver)
 void MPICommunication::receive(std::string &itemToReceive, int rankSender)
 {
   PRECICE_TRACE(itemToReceive, rankSender);
-  rankSender = adjustRank(rankSender);
-  int        length;
+  rankSender        = adjustRank(rankSender);
+  int        length = 0;
   MPI_Status status;
   MPI_Probe(rank(rankSender), 0, communicator(rankSender), &status);
   MPI_Get_count(&status, MPI_CHAR, &length);
@@ -245,7 +245,7 @@ PtrRequest MPICommunication::aReceive(double *itemsToReceive, int size, int rank
   PRECICE_TRACE(size);
   rankSender = adjustRank(rankSender);
 
-  MPI_Request request;
+  MPI_Request request = nullptr;
   MPI_Irecv(itemsToReceive,
             size,
             MPI_DOUBLE,
@@ -262,7 +262,7 @@ PtrRequest MPICommunication::aReceive(std::vector<double> &itemsToReceive, int r
   PRECICE_TRACE(itemsToReceive.size());
   rankSender = adjustRank(rankSender);
 
-  MPI_Request request;
+  MPI_Request request = nullptr;
   MPI_Irecv(itemsToReceive.data(),
             itemsToReceive.size(),
             MPI_DOUBLE,
@@ -316,7 +316,7 @@ PtrRequest MPICommunication::aReceive(int &itemToReceive, int rankSender)
   PRECICE_TRACE(rankSender);
   rankSender = adjustRank(rankSender);
 
-  MPI_Request request;
+  MPI_Request request = nullptr;
   MPI_Irecv(&itemToReceive,
             1,
             MPI_INT,
@@ -349,7 +349,7 @@ PtrRequest MPICommunication::aReceive(bool &itemToReceive, int rankSender)
   PRECICE_TRACE(rankSender);
   rankSender = adjustRank(rankSender);
 
-  MPI_Request request;
+  MPI_Request request = nullptr;
   MPI_Irecv(&itemToReceive,
             1,
             MPI_BOOL,

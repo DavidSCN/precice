@@ -1495,11 +1495,11 @@ void SolverInterfaceImpl::mapWrittenData()
 {
   PRECICE_TRACE();
   using namespace mapping;
-  MappingConfiguration::Timing timing;
+
   // Compute mappings
   for (impl::MappingContext &context : _accessor->writeMappingContexts()) {
-    timing         = context.timing;
-    bool rightTime = timing == MappingConfiguration::ON_ADVANCE;
+    const MappingConfiguration::Timing timing    = context.timing;
+    bool                               rightTime = timing == MappingConfiguration::ON_ADVANCE;
     rightTime |= timing == MappingConfiguration::INITIAL;
     bool hasComputed = context.mapping->hasComputedMapping();
     if (rightTime && not hasComputed) {
@@ -1512,9 +1512,9 @@ void SolverInterfaceImpl::mapWrittenData()
 
   // Map data
   for (impl::DataContext &context : _accessor->writeDataContexts()) {
-    timing          = context.mappingContext.timing;
-    bool hasMapping = context.mappingContext.mapping.get() != nullptr;
-    bool rightTime  = timing == MappingConfiguration::ON_ADVANCE;
+    MappingConfiguration::Timing timing     = context.mappingContext.timing;
+    bool                         hasMapping = context.mappingContext.mapping.get() != nullptr;
+    bool                         rightTime  = timing == MappingConfiguration::ON_ADVANCE;
     rightTime |= timing == MappingConfiguration::INITIAL;
     bool hasMapped = context.mappingContext.hasMappedData;
     if (hasMapping && rightTime && (not hasMapped)) {
@@ -1542,12 +1542,13 @@ void SolverInterfaceImpl::mapWrittenData()
 void SolverInterfaceImpl::mapReadData()
 {
   PRECICE_TRACE();
-  mapping::MappingConfiguration::Timing timing;
+  using namespace mapping;
+
   // Compute mappings
   for (impl::MappingContext &context : _accessor->readMappingContexts()) {
-    timing      = context.timing;
-    bool mapNow = timing == mapping::MappingConfiguration::ON_ADVANCE;
-    mapNow |= timing == mapping::MappingConfiguration::INITIAL;
+    const MappingConfiguration::Timing timing = context.timing;
+    bool                               mapNow = timing == MappingConfiguration::ON_ADVANCE;
+    mapNow |= timing == MappingConfiguration::INITIAL;
     bool hasComputed = context.mapping->hasComputedMapping();
     if (mapNow && not hasComputed) {
       PRECICE_INFO("Compute read mapping from mesh \"{}\" to mesh \"{}\".",
@@ -1560,9 +1561,9 @@ void SolverInterfaceImpl::mapReadData()
 
   // Map data
   for (impl::DataContext &context : _accessor->readDataContexts()) {
-    timing      = context.mappingContext.timing;
-    bool mapNow = timing == mapping::MappingConfiguration::ON_ADVANCE;
-    mapNow |= timing == mapping::MappingConfiguration::INITIAL;
+    const MappingConfiguration::Timing timing = context.mappingContext.timing;
+    bool                               mapNow = timing == MappingConfiguration::ON_ADVANCE;
+    mapNow |= timing == MappingConfiguration::INITIAL;
     bool hasMapping = context.mappingContext.mapping.get() != nullptr;
     bool hasMapped  = context.mappingContext.hasMappedData;
     if (mapNow && hasMapping && (not hasMapped)) {
@@ -1577,7 +1578,7 @@ void SolverInterfaceImpl::mapReadData()
   }
   // Clear non-initial, non-incremental mappings
   for (impl::MappingContext &context : _accessor->readMappingContexts()) {
-    bool isStationary = context.timing == mapping::MappingConfiguration::INITIAL;
+    bool isStationary = context.timing == MappingConfiguration::INITIAL;
     if (not isStationary) {
       context.mapping->clear();
     }
@@ -1677,7 +1678,7 @@ void SolverInterfaceImpl::syncTimestep(double computedTimestepLength)
     utils::MasterSlave::_communication->send(computedTimestepLength, 0);
   } else if (utils::MasterSlave::isMaster()) {
     for (int rankSlave = 1; rankSlave < _accessorCommunicatorSize; rankSlave++) {
-      double dt;
+      double dt = NAN;
       utils::MasterSlave::_communication->receive(dt, rankSlave);
       PRECICE_CHECK(math::equals(dt, computedTimestepLength),
                     "Found ambiguous values for the timestep length passed to preCICE in \"advance\". On rank {}, the value is {}, while on rank 0, the value is {}.",

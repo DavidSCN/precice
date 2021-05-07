@@ -275,7 +275,7 @@ void M2N::receive(double *itemsToReceive,
 
     if (precice::syncMode) {
       if (not utils::MasterSlave::isSlave()) {
-        bool ack;
+        bool ack = false;
 
         _masterCom->receive(ack, 0);
         _masterCom->send(ack, 0);

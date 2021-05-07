@@ -26,7 +26,8 @@ public:
   enum Constraint {
     CONSISTENT,
     CONSERVATIVE,
-    SCALEDCONSISTENT
+    SCALEDCONSISTENT,
+    UNKNOWN
   };
 
   /**

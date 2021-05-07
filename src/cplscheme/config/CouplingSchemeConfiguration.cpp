@@ -898,7 +898,7 @@ PtrCouplingScheme CouplingSchemeConfiguration::createMultiCouplingScheme(
 {
   PRECICE_TRACE(accessor);
 
-  BaseCouplingScheme *scheme;
+  BaseCouplingScheme *scheme = nullptr;
 
   if (accessor == _config.controller) {
     std::vector<m2n::PtrM2N> m2ns;

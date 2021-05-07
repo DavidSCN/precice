@@ -284,7 +284,7 @@ MappingConfiguration::ConfiguredMapping MappingConfiguration::createMapping(
     PRECICE_UNREACHABLE("Unknown mapping direction type \"{}\".", direction);
   }
 
-  Mapping::Constraint constraintValue;
+  Mapping::Constraint constraintValue = Mapping::UNKNOWN;
   if (constraint == VALUE_CONSERVATIVE) {
     constraintValue = Mapping::CONSERVATIVE;
   } else if (constraint == VALUE_CONSISTENT) {

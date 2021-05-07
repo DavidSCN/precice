@@ -266,7 +266,7 @@ Event &EventRegistry::getStoredEvent(std::string const &name)
 
 void EventRegistry::printAll() const
 {
-  int myRank;
+  int myRank = 0;
   MPI_Comm_rank(comm, &myRank);
 
   if (myRank != 0)
@@ -290,7 +290,7 @@ void EventRegistry::printAll() const
 
 void EventRegistry::writeSummary(std::ostream &out) const
 {
-  int rank, size;
+  int rank = 0, size = 0;
   MPI_Comm_rank(comm, &rank);
   MPI_Comm_size(comm, &size);
 
@@ -403,7 +403,7 @@ void EventRegistry::collect()
 {
 #ifndef PRECICE_NO_MPI
   // Register MPI datatype
-  MPI_Datatype MPI_EVENTDATA;
+  MPI_Datatype MPI_EVENTDATA   = nullptr;
   int          blocklengths[]  = {255, 1, 3, 2};
   MPI_Aint     displacements[] = {offsetof(MPI_EventData, name), offsetof(MPI_EventData, count),
                               offsetof(MPI_EventData, total), offsetof(MPI_EventData, dataSize)};
@@ -411,7 +411,7 @@ void EventRegistry::collect()
   MPI_Type_create_struct(4, blocklengths, displacements, types, &MPI_EVENTDATA);
   MPI_Type_commit(&MPI_EVENTDATA);
 
-  int rank, MPIsize;
+  int rank = 0, MPIsize = 0;
   MPI_Comm_rank(comm, &rank);
   MPI_Comm_size(comm, &MPIsize);
 
@@ -424,7 +424,7 @@ void EventRegistry::collect()
   std::vector<std::vector<long>> stateChangesBuf(eventsSize);
   int                            i = 0;
 
-  MPI_Request req;
+  MPI_Request req = nullptr;
 
   // Send the times from the local RankData
   std::array<long, 2> times = {localRankData.initializedAt.time_since_epoch().count(),
@@ -529,8 +529,8 @@ void EventRegistry::collect()
 
 void EventRegistry::normalize()
 {
-  long ticks = localRankData.initializedAt.time_since_epoch().count();
-  long minTicks;
+  long ticks    = localRankData.initializedAt.time_since_epoch().count();
+  long minTicks = 0;
   MPI_Allreduce(&ticks, &minTicks, 1, MPI_LONG, MPI_MIN, EventRegistry::instance().getMPIComm());
 
   // This assumes the same epoch and ticks rep, should be true for system time
@@ -541,12 +541,12 @@ void EventRegistry::normalize()
 std::pair<sys_clk::time_point, sys_clk::time_point>
 EventRegistry::collectInitAndFinalize()
 {
-  long ticks = localRankData.initializedAt.time_since_epoch().count();
-  long minTicks;
+  long ticks    = localRankData.initializedAt.time_since_epoch().count();
+  long minTicks = 0;
   MPI_Reduce(&ticks, &minTicks, 1, MPI_LONG, MPI_MIN, 0, EventRegistry::instance().getMPIComm());
 
-  ticks = localRankData.finalizedAt.time_since_epoch().count();
-  long maxTicks;
+  ticks         = localRankData.finalizedAt.time_since_epoch().count();
+  long maxTicks = 0;
   MPI_Reduce(&ticks, &maxTicks, 1, MPI_LONG, MPI_MAX, 0, EventRegistry::instance().getMPIComm());
 
   // This assumes the same epoch and ticks rep, should be true for system time

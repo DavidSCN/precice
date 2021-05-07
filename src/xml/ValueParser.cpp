@@ -19,7 +19,7 @@ double parseDouble(const std::string &rawValue)
     iss.imbue(std::locale(PARSING_LOCALE));
   } catch (...) {
   }
-  double value;
+  double value = NAN;
   iss >> value;
   if (!iss.eof()) {
     throw std::runtime_error{"Could not fully parse value \"" + rawValue + "\" as a double."};

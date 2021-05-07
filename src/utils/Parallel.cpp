@@ -244,7 +244,7 @@ void Parallel::finalizeMPI()
 {
 #ifndef PRECICE_NO_MPI
   PRECICE_TRACE();
-  int isMPIInitialized;
+  int isMPIInitialized = 0;
   MPI_Initialized(&isMPIInitialized);
   PRECICE_ASSERT(isMPIInitialized, "MPI was not initalized.");
   PRECICE_DEBUG("Finalize MPI");
@@ -507,14 +507,14 @@ void Parallel::restrictCommunicator(int newSize)
   // If the requested size is the same as the capacity, then simply duplicate the comm
   if (newSize == size) {
     PRECICE_DEBUG("Restriction to capacity: duplicating Comm");
-    MPI_Comm copiedComm;
+    MPI_Comm copiedComm = nullptr;
     MPI_Comm_dup(baseState->comm, &copiedComm);
     pushState(CommState::fromComm(copiedComm));
     return;
   }
 
   // Create group, containing all processes of communicator
-  MPI_Group currentGroup;
+  MPI_Group currentGroup = nullptr;
   MPI_Comm_group(baseState->comm, &currentGroup);
 
   // Prepare a ranks vector with 0,1,2,...,newSize-1
@@ -523,7 +523,7 @@ void Parallel::restrictCommunicator(int newSize)
 
   // Create subgroup, containing processes contained in ranks
   PRECICE_DEBUG("Create restricted group");
-  MPI_Group restrictedGroup;
+  MPI_Group restrictedGroup = nullptr;
   MPI_Group_incl(currentGroup, ranks.size(), ranks.data(), &restrictedGroup);
 
   // @todo check if it has to go back down to the other group free

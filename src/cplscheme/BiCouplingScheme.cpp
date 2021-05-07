@@ -93,7 +93,7 @@ std::vector<std::string> BiCouplingScheme::getCouplingPartners() const
 bool BiCouplingScheme::receiveConvergence()
 {
   PRECICE_ASSERT(doesFirstStep(), "For convergence information the receiving participant is always the first one.");
-  bool convergence;
+  bool convergence = false;
   _m2n->receive(convergence);
   return convergence;
 }

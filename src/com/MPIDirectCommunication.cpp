@@ -198,7 +198,7 @@ void MPIDirectCommunication::broadcast(bool itemToSend)
 void MPIDirectCommunication::broadcast(bool &itemToReceive, int rankBroadcaster)
 {
   PRECICE_TRACE();
-  int item;
+  int item = 0;
   broadcast(item, rankBroadcaster);
   itemToReceive = item;
 }

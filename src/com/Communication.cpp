@@ -281,7 +281,7 @@ void Communication::broadcast(bool itemToSend)
 void Communication::broadcast(bool &itemToReceive, int rankBroadcaster)
 {
   PRECICE_TRACE();
-  int item;
+  int item = 0;
   broadcast(item, rankBroadcaster);
   itemToReceive = item;
 }

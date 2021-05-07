@@ -43,7 +43,7 @@ BarycentricCoordsAndProjected calcBarycentricCoordsForEdge(
     collinear = math::geometry::collinear(a, b, c);
     if (collinear) {
       // From p(s) = a + s(b-a) we get: s = (p(s) - a) / (b-a)
-      int iMax;
+      int iMax = 0;
       ab.cwiseAbs().maxCoeff(&iMax);
       PRECICE_ASSERT(!math::equals(ab(iMax), 0.0));
       barycentricCoords[0] = (location(iMax) - a(iMax)) / ab(iMax);
@@ -63,7 +63,7 @@ BarycentricCoordsAndProjected calcBarycentricCoordsForEdge(
     collinear     = math::geometry::collinear(a3D, b3D, c3D);
     if (collinear) {
       // From p(s) = a + s(b-a) we get: s = (p(s) - a) / (b-a)
-      int iMax;
+      int iMax = 0;
       ab3D.cwiseAbs().maxCoeff(&iMax);
       PRECICE_ASSERT(!math::equals(ab3D[iMax], 0.0));
       barycentricCoords[0] =
@@ -76,8 +76,8 @@ BarycentricCoordsAndProjected calcBarycentricCoordsForEdge(
     // Project parameters to 2D, where the projection plane is determined from
     // the normal direction, in order to prevent "faulty" projections.
     Vector3d normal;
-    normal = ab3D.cross(ac3D);
-    int indexToRemove;
+    normal            = ab3D.cross(ac3D);
+    int indexToRemove = 0;
     normal.cwiseAbs().maxCoeff(&indexToRemove);
     int indices[2];
     if (indexToRemove == 0) {
@@ -154,7 +154,7 @@ BarycentricCoordsAndProjected calcBarycentricCoordsForTriangle(
   projected += location;
 
   // Project everything to 2D
-  int iMax;
+  int iMax = 0;
   normal.cwiseAbs().maxCoeff(&iMax);
   int indices[2];
   if (iMax == 0) {

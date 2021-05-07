@@ -63,7 +63,7 @@ void MPISinglePortsCommunication::acceptConnection(std::string const &acceptorNa
   int peerCount   = -1; // The total count of peers (initialized in the first iteration)
   do {
     // Connection
-    MPI_Comm communicator;
+    MPI_Comm communicator = nullptr;
     MPI_Comm_accept(const_cast<char *>(_portName.c_str()), MPI_INFO_NULL, 0, MPI_COMM_SELF, &communicator);
     PRECICE_DEBUG("Accepted connection at {} for peer {}", _portName, peerCurrent);
 
@@ -145,7 +145,7 @@ void MPISinglePortsCommunication::requestConnection(std::string const &acceptorN
   _portName = conInfo.read();
   PRECICE_DEBUG("Request connection to {}", _portName);
 
-  MPI_Comm communicator;
+  MPI_Comm communicator = nullptr;
   MPI_Comm_connect(const_cast<char *>(_portName.c_str()), MPI_INFO_NULL, 0, MPI_COMM_SELF, &communicator);
   PRECICE_DEBUG("Requested connection to {}", _portName);
 

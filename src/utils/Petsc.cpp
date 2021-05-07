@@ -77,12 +77,12 @@ void Petsc::initialize(
 {
   PRECICE_TRACE();
 #ifndef PRECICE_NO_PETSC
-  PetscBool petscIsInitialized;
+  PetscBool petscIsInitialized = PETSC_FALSE;
   PetscInitialized(&petscIsInitialized);
   if (not petscIsInitialized) {
-    PETSC_COMM_WORLD = comm;
-    PetscErrorCode ierr;
-    ierr = PetscInitialize(argc, argv, "", nullptr);
+    PETSC_COMM_WORLD    = comm;
+    PetscErrorCode ierr = 0;
+    ierr                = PetscInitialize(argc, argv, "", nullptr);
     CHKERRV(ierr);
     weInitialized = true;
     PetscPushErrorHandler(&PetscMPIAbortErrorHandler, nullptr);
@@ -93,7 +93,7 @@ void Petsc::initialize(
 void Petsc::finalize()
 {
 #ifndef PRECICE_NO_PETSC
-  PetscBool petscIsInitialized;
+  PetscBool petscIsInitialized = PETSC_FALSE;
   PetscInitialized(&petscIsInitialized);
   if (petscIsInitialized and weInitialized) {
     PetscOptionsSetValueWrapper("-options_left", "no");
@@ -160,7 +160,7 @@ struct Viewer {
 template <class T>
 MPI_Comm getCommunicator(T obj)
 {
-  MPI_Comm comm;
+  MPI_Comm comm = nullptr;
   PetscObjectGetComm(reinterpret_cast<PetscObject>(obj), &comm);
   return comm;
 }
@@ -176,7 +176,7 @@ void setName(T obj, std::string name)
 template <class T>
 std::string getName(T obj)
 {
-  const char *cstr;
+  const char *cstr = nullptr;
   PetscObjectGetName(reinterpret_cast<PetscObject>(obj), &cstr);
   return cstr;
 }
@@ -214,7 +214,7 @@ Vector &Vector::operator=(Vector &&other) noexcept
 
 Vector::Vector(const std::string &name)
 {
-  int size;
+  int size = 0;
   MPI_Comm_size(utils::Parallel::current()->comm, &size);
   PetscErrorCode ierr = 0;
   ierr                = VecCreate(utils::Parallel::current()->comm, &vector);
@@ -230,8 +230,8 @@ Vector::Vector(Vec &v, const std::string &name)
 
 Vector::~Vector()
 {
-  PetscErrorCode ierr = 0;
-  PetscBool      petscIsInitialized;
+  PetscErrorCode ierr               = 0;
+  PetscBool      petscIsInitialized = PETSC_FALSE;
   PetscInitialized(&petscIsInitialized);
   if (petscIsInitialized && vector) // If PetscFinalize is called before ~Vector
     ierr = VecDestroy(&vector);
@@ -250,9 +250,9 @@ Vector Vector::allocate(Vector &other, const std::string &name)
 
 Vector Vector::allocate(Vec &other, const std::string &name)
 {
-  Vec            newvector;
-  PetscErrorCode ierr = 0;
-  ierr                = VecDuplicate(other, &newvector);
+  Vec            newvector = nullptr;
+  PetscErrorCode ierr      = 0;
+  ierr                     = VecDuplicate(other, &newvector);
   [&] { CHKERRV(ierr); }();
   return Vector{newvector, name};
 }
@@ -264,7 +264,7 @@ Vector Vector::allocate(Matrix &m, const std::string &name, LEFTRIGHT type)
 
 Vector Vector::allocate(Mat &m, const std::string &name, LEFTRIGHT type)
 {
-  Vec newvector;
+  Vec newvector = nullptr;
   // MatGetVecs is deprecated, we keep it due to the old PETSc version at the SuperMUC.
   PetscErrorCode ierr = 0;
   if (type == LEFTRIGHT::LEFT) {
@@ -299,8 +299,8 @@ void Vector::init(PetscInt rows)
 PetscInt Vector::getSize() const
 {
   PetscErrorCode ierr = 0;
-  PetscInt       size;
-  ierr = VecGetSize(vector, &size);
+  PetscInt       size = 0;
+  ierr                = VecGetSize(vector, &size);
   CHKERRQ(ierr);
   return size;
 }
@@ -308,8 +308,8 @@ PetscInt Vector::getSize() const
 PetscInt Vector::getLocalSize() const
 {
   PetscErrorCode ierr = 0;
-  PetscInt       size;
-  ierr = VecGetLocalSize(vector, &size);
+  PetscInt       size = 0;
+  ierr                = VecGetLocalSize(vector, &size);
   CHKERRQ(ierr);
   return size;
 }
@@ -323,9 +323,9 @@ void Vector::setValue(PetscInt row, PetscScalar value)
 
 void Vector::arange(double start, double stop)
 {
-  PetscErrorCode ierr = 0;
-  PetscScalar *  a;
-  PetscInt       range_start, range_end, size;
+  PetscErrorCode ierr        = 0;
+  PetscScalar *  a           = nullptr;
+  PetscInt       range_start = 0, range_end = 0, size = 0;
   VecGetSize(vector, &size);
   VecGetOwnershipRange(vector, &range_start, &range_end);
   double step_size = (stop - start) / size;
@@ -340,7 +340,7 @@ void Vector::arange(double start, double stop)
 void Vector::fillWithRandoms()
 {
   PetscErrorCode ierr = 0;
-  PetscRandom    rctx;
+  PetscRandom    rctx = nullptr;
 
   std::random_device                     rd;
   std::uniform_real_distribution<double> dist(0, 1);
@@ -357,9 +357,9 @@ void Vector::fillWithRandoms()
 void Vector::sort()
 {
   PetscErrorCode ierr = 0;
-  PetscInt       size;
-  PetscReal *    a;
-  ierr = VecGetArray(vector, &a);
+  PetscInt       size = 0;
+  PetscReal *    a    = nullptr;
+  ierr                = VecGetArray(vector, &a);
   CHKERRV(ierr);
   ierr = VecGetSize(vector, &size);
   CHKERRV(ierr);
@@ -380,7 +380,7 @@ void Vector::assemble()
 
 std::pair<PetscInt, PetscInt> Vector::ownerRange() const
 {
-  PetscInt range_start, range_end;
+  PetscInt range_start = 0, range_end = 0;
   VecGetOwnershipRange(vector, &range_start, &range_end);
   return std::make_pair(range_start, range_end);
 }
@@ -393,7 +393,7 @@ void Vector::write(std::string filename, VIEWERFORMAT format) const
 
 double Vector::l2norm() const
 {
-  PetscReal val;
+  PetscReal val = NAN;
   VecNorm(vector, NORM_2, &val);
   return val;
 }
@@ -406,8 +406,8 @@ void Vector::read(std::string filename, VIEWERFORMAT format)
 
 void Vector::view() const
 {
-  PetscErrorCode ierr;
-  ierr = VecView(vector, PETSC_VIEWER_STDOUT_WORLD);
+  PetscErrorCode ierr = 0;
+  ierr                = VecView(vector, PETSC_VIEWER_STDOUT_WORLD);
   CHKERRV(ierr);
 }
 
@@ -428,8 +428,8 @@ Matrix::Matrix(std::string name)
 
 Matrix::~Matrix()
 {
-  PetscErrorCode ierr = 0;
-  PetscBool      petscIsInitialized;
+  PetscErrorCode ierr               = 0;
+  PetscBool      petscIsInitialized = PETSC_FALSE;
   PetscInitialized(&petscIsInitialized);
   if (petscIsInitialized && matrix) // If PetscFinalize is called before ~Matrix
     ierr = MatDestroy(&matrix);
@@ -495,7 +495,7 @@ void Matrix::setValue(PetscInt row, PetscInt col, PetscScalar value)
 void Matrix::fillWithRandoms()
 {
   PetscErrorCode ierr = 0;
-  PetscRandom    rctx;
+  PetscRandom    rctx = nullptr;
 
   std::random_device                     rd;
   std::uniform_real_distribution<double> dist(0, 1);
@@ -511,9 +511,9 @@ void Matrix::fillWithRandoms()
 
 void Matrix::setColumn(Vector &v, PetscInt col)
 {
-  PetscErrorCode     ierr = 0;
-  const PetscScalar *vec;
-  PetscInt           range_start, range_end;
+  PetscErrorCode     ierr        = 0;
+  const PetscScalar *vec         = nullptr;
+  PetscInt           range_start = 0, range_end = 0;
   VecGetOwnershipRange(v.vector, &range_start, &range_end);
   std::vector<PetscInt> irow(range_end - range_start);
   std::iota(irow.begin(), irow.end(), range_start);
@@ -532,28 +532,28 @@ void Matrix::setColumn(Vector &v, PetscInt col)
 
 std::pair<PetscInt, PetscInt> Matrix::getSize() const
 {
-  PetscInt m, n;
+  PetscInt m = 0, n = 0;
   MatGetSize(matrix, &m, &n);
   return std::make_pair(m, n);
 }
 
 std::pair<PetscInt, PetscInt> Matrix::getLocalSize() const
 {
-  PetscInt m, n;
+  PetscInt m = 0, n = 0;
   MatGetLocalSize(matrix, &m, &n);
   return std::make_pair(m, n);
 }
 
 std::pair<PetscInt, PetscInt> Matrix::ownerRange() const
 {
-  PetscInt range_start, range_end;
+  PetscInt range_start = 0, range_end = 0;
   MatGetOwnershipRange(matrix, &range_start, &range_end);
   return std::make_pair(range_start, range_end);
 }
 
 std::pair<PetscInt, PetscInt> Matrix::ownerRangeColumn() const
 {
-  PetscInt range_start, range_end;
+  PetscInt range_start = 0, range_end = 0;
   MatGetOwnershipRangeColumn(matrix, &range_start, &range_end);
   return std::make_pair(range_start, range_end);
 }
@@ -561,8 +561,8 @@ std::pair<PetscInt, PetscInt> Matrix::ownerRangeColumn() const
 PetscInt Matrix::blockSize() const
 {
   PetscErrorCode ierr = 0;
-  PetscInt       bs;
-  ierr = MatGetBlockSize(matrix, &bs);
+  PetscInt       bs   = 0;
+  ierr                = MatGetBlockSize(matrix, &bs);
   CHKERRQ(ierr);
   return bs;
 }
@@ -600,8 +600,8 @@ void Matrix::viewDraw() const
   ierr = MatView(matrix, viewer.viewer);
   CHKERRV(ierr);
 
-  PetscDraw draw;
-  ierr = PetscViewerDrawGetDraw(viewer.viewer, 0, &draw);
+  PetscDraw draw = nullptr;
+  ierr           = PetscViewerDrawGetDraw(viewer.viewer, 0, &draw);
   CHKERRV(ierr);
   ierr = PetscDrawSetPause(draw, -1);
   CHKERRV(ierr); // Wait for user
@@ -619,8 +619,8 @@ KSPSolver::KSPSolver(std::string name)
 
 KSPSolver::~KSPSolver()
 {
-  PetscErrorCode ierr = 0;
-  PetscBool      petscIsInitialized;
+  PetscErrorCode ierr               = 0;
+  PetscBool      petscIsInitialized = PETSC_FALSE;
   PetscInitialized(&petscIsInitialized);
   if (petscIsInitialized && ksp) // If PetscFinalize is called before ~KSPSolver
     ierr = KSPDestroy(&ksp);
@@ -641,9 +641,9 @@ void KSPSolver::reset()
 
 KSPSolver::SolverResult KSPSolver::getSolverResult()
 {
-  KSPConvergedReason convReason;
-  PetscErrorCode     ierr = 0;
-  ierr                    = KSPGetConvergedReason(ksp, &convReason);
+  KSPConvergedReason convReason = KSP_DIVERGED_NULL;
+  PetscErrorCode     ierr       = 0;
+  ierr                          = KSPGetConvergedReason(ksp, &convReason);
   if (ierr != 0) {
     return SolverResult::Diverged;
   }
@@ -673,11 +673,11 @@ std::string KSPSolver::summaryFor(Vector &b)
 {
   // See PETSc manual page for KSPGetConvergedReason to understand this function
   // We treat divergence due to reaching max iterations as "stopped"
-  KSPConvergedReason convReason;
+  KSPConvergedReason convReason = KSP_DIVERGED_NULL;
   KSPGetConvergedReason(ksp, &convReason);
 
-  PetscReal rtol, atol, dtol;
-  PetscInt  miter;
+  PetscReal rtol = NAN, atol = NAN, dtol = NAN;
+  PetscInt  miter = 0;
   KSPGetTolerances(ksp, &rtol, &atol, &dtol, &miter);
 
   std::ostringstream oss;
@@ -726,8 +726,8 @@ std::string KSPSolver::summaryFor(Vector &b)
 PetscInt KSPSolver::getIterationNumber()
 {
   PetscErrorCode ierr = 0;
-  PetscInt       its;
-  ierr = KSPGetIterationNumber(ksp, &its);
+  PetscInt       its  = 0;
+  ierr                = KSPGetIterationNumber(ksp, &its);
   CHKERRQ(ierr);
   return its;
 }
@@ -735,8 +735,8 @@ PetscInt KSPSolver::getIterationNumber()
 PetscReal KSPSolver::getResidualNorm()
 {
   PetscErrorCode ierr = 0;
-  PetscReal      val;
-  ierr = KSPGetResidualNorm(ksp, &val);
+  PetscReal      val  = NAN;
+  ierr                = KSPGetResidualNorm(ksp, &val);
   CHKERRQ(ierr);
   return val;
 }
@@ -744,8 +744,8 @@ PetscReal KSPSolver::getResidualNorm()
 PetscReal KSPSolver::getRealtiveTolerance()
 {
   PetscErrorCode ierr = 0;
-  PetscReal      rtol;
-  ierr = KSPGetTolerances(ksp, &rtol, nullptr, nullptr, nullptr);
+  PetscReal      rtol = NAN;
+  ierr                = KSPGetTolerances(ksp, &rtol, nullptr, nullptr, nullptr);
   CHKERRQ(ierr);
   return rtol;
 }
@@ -754,8 +754,8 @@ PetscReal KSPSolver::getRealtiveTolerance()
 
 void destroy(ISLocalToGlobalMapping *IS)
 {
-  PetscErrorCode ierr = 0;
-  PetscBool      petscIsInitialized;
+  PetscErrorCode ierr               = 0;
+  PetscBool      petscIsInitialized = PETSC_FALSE;
   PetscInitialized(&petscIsInitialized);
 
   if (IS and petscIsInitialized) {
@@ -766,8 +766,8 @@ void destroy(ISLocalToGlobalMapping *IS)
 
 void destroy(AO *ao)
 {
-  PetscErrorCode ierr = 0;
-  PetscBool      petscIsInitialized;
+  PetscErrorCode ierr               = 0;
+  PetscBool      petscIsInitialized = PETSC_FALSE;
   PetscInitialized(&petscIsInitialized);
 
   if (ao and petscIsInitialized) {

@@ -52,7 +52,7 @@ void CommunicateBoundingBox::receiveBoundingBoxMap(
     int                         rankSender)
 {
   PRECICE_TRACE(rankSender);
-  int sizeOfReceivingMap;
+  int sizeOfReceivingMap = 0;
   _communication->receive(sizeOfReceivingMap, rankSender);
 
   PRECICE_ASSERT(sizeOfReceivingMap == (int) bbm.size(), "Incoming size of map is not compatible");
@@ -81,14 +81,14 @@ void CommunicateBoundingBox::receiveConnectionMap(
     int                              rankSender)
 {
   PRECICE_TRACE(rankSender);
-  int sizeOfReceivingMap;
+  int sizeOfReceivingMap = 0;
   _communication->receive(sizeOfReceivingMap, rankSender);
   PRECICE_ASSERT(sizeOfReceivingMap == (int) fbm.size());
 
   std::vector<int> connected_ranks;
 
   for (size_t i = 0; i < fbm.size(); ++i) {
-    int rank;
+    int rank = 0;
     _communication->receive(rank, rankSender);
     _communication->receive(connected_ranks, rankSender);
     fbm[rank] = connected_ranks;
@@ -111,7 +111,7 @@ void CommunicateBoundingBox::broadcastReceiveBoundingBoxMap(
     mesh::Mesh::BoundingBoxMap &bbm)
 {
   PRECICE_TRACE();
-  int sizeOfReceivingMap;
+  int sizeOfReceivingMap = 0;
   _communication->broadcast(sizeOfReceivingMap, 0);
   PRECICE_ASSERT(sizeOfReceivingMap == (int) bbm.size());
 
@@ -139,7 +139,7 @@ void CommunicateBoundingBox::broadcastReceiveConnectionMap(
     std::map<int, std::vector<int>> &fbm)
 {
   PRECICE_TRACE();
-  int sizeOfReceivingMap;
+  int sizeOfReceivingMap = 0;
   _communication->broadcast(sizeOfReceivingMap, 0);
   PRECICE_ASSERT(sizeOfReceivingMap == (int) fbm.size());
 

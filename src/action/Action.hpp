@@ -21,7 +21,8 @@ public:
     WRITE_MAPPING_PRIOR,          // Everytime, before write mapping
     WRITE_MAPPING_POST,           // Everytime, after write mapping and before advancing cpl scheme
     READ_MAPPING_PRIOR,           // Everytime, after advancing cpl scheme and before read mapping
-    READ_MAPPING_POST             // Everytime, after read mapping
+    READ_MAPPING_POST,            // Everytime, after read mapping
+    UNKNOWN                       // For initialization
   };
 
   Action(

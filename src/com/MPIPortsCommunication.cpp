@@ -54,7 +54,7 @@ void MPIPortsCommunication::acceptConnection(std::string const &acceptorName,
   int peerCurrent = 0;  // Current peer to connect to
   do {
     // Connection
-    MPI_Comm communicator;
+    MPI_Comm communicator = nullptr;
     MPI_Comm_accept(const_cast<char *>(_portName.c_str()), MPI_INFO_NULL, 0, MPI_COMM_SELF, &communicator);
     PRECICE_DEBUG("Accepted connection at {} for peer {}", _portName, peerCurrent);
 
@@ -110,7 +110,7 @@ void MPIPortsCommunication::acceptConnectionAsServer(std::string const &acceptor
   PRECICE_DEBUG("Accept connection at {}", _portName);
 
   for (int connection = 0; connection < requesterCommunicatorSize; ++connection) {
-    MPI_Comm communicator;
+    MPI_Comm communicator = nullptr;
     MPI_Comm_accept(const_cast<char *>(_portName.c_str()), MPI_INFO_NULL, 0, MPI_COMM_SELF, &communicator);
     PRECICE_DEBUG("Accepted connection at {}", _portName);
 
@@ -146,7 +146,7 @@ void MPIPortsCommunication::requestConnection(std::string const &acceptorName,
 
   PRECICE_DEBUG("Request connection to {}", _portName);
 
-  MPI_Comm communicator;
+  MPI_Comm communicator = nullptr;
   MPI_Comm_connect(const_cast<char *>(_portName.c_str()), MPI_INFO_NULL, 0, MPI_COMM_SELF, &communicator);
   PRECICE_DEBUG("Requested connection to {}", _portName);
 
@@ -185,7 +185,7 @@ void MPIPortsCommunication::requestConnectionAsClient(std::string const &  accep
     _portName = conInfo.read();
     PRECICE_DEBUG("Request connection to {}", _portName);
 
-    MPI_Comm communicator;
+    MPI_Comm communicator = nullptr;
     MPI_Comm_connect(const_cast<char *>(_portName.c_str()), MPI_INFO_NULL, 0, MPI_COMM_SELF, &communicator);
     PRECICE_DEBUG("Requested connection to {}", _portName);
 

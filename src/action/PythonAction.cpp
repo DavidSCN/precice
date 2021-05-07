@@ -25,7 +25,7 @@ namespace action {
 namespace {
 std::string python_error_as_string()
 {
-  PyObject *ptype, *pvalue, *ptraceback;
+  PyObject *ptype = nullptr, *pvalue = nullptr, *ptraceback = nullptr;
   PyErr_Fetch(&ptype, &pvalue, &ptraceback);
   if (ptype == nullptr) {
     return "<no error available>";

@@ -300,7 +300,7 @@ void ActionConfiguration::createAction()
 action::Action::Timing ActionConfiguration::getTiming() const
 {
   PRECICE_TRACE(_configuredAction.timing);
-  action::Action::Timing timing;
+  action::Action::Timing timing = action::Action::UNKNOWN;
   if (_configuredAction.timing == VALUE_REGULAR_PRIOR) {
     timing = action::Action::WRITE_MAPPING_PRIOR;
     PRECICE_WARN("Regular-prior action timing is deprecated. Regular-prior will now revert to write-mapping-prior which performs "

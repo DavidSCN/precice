@@ -180,7 +180,7 @@ void SocketCommunication::acceptConnectionAsServer(std::string const &acceptorNa
       PRECICE_DEBUG("Accepted connection at {}", address);
       _isConnected = true;
 
-      int requesterRank;
+      int requesterRank = 0;
       asio::read(*socket, asio::buffer(&requesterRank, sizeof(int)));
       _sockets[requesterRank] = socket;
     }

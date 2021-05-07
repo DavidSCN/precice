@@ -138,7 +138,7 @@ void ExportVTKXML::writeSubFile(
     mesh::Mesh &       mesh)
 {
   int numPoints = mesh.vertices().size(); // number of vertices
-  int numCells;                           // number of cells
+  int numCells  = 0;                      // number of cells
   if (_meshDimensions == 2) {
     numCells = mesh.edges().size();
   } else {
